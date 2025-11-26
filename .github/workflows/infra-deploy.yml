@@ -43,7 +43,7 @@ jobs:
           TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
       
       - name: Terraform Action
-        run: terraform ${{ github.event.inputs.terraform_action || 'plan' }}
+        run: terraform ${{ github.event.inputs.terraform_action || 'apply' }} -auto-approve
         env:
           TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
           TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}

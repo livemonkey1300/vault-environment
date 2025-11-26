@@ -1,0 +1,46 @@
+name: Full Infrastructure Deploy with Vault
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      terraform_action:
+        description: 'Terraform action'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+        - apply
+        - plan
+
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
+      - name: Terraform Init
+        run: terraform init
+      
+      - name: Terraform Action
+        run: terraform ${{ github.event.inputs.terraform_action || 'plan' }}
+        env:
+          TF_VAR_environment: ${{ github.event.inputs.environment || 'staging' }}
+          TF_VAR_tfc_workspace: ${{ vars.TFC_WORKSPACE }}

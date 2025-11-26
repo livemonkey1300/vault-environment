@@ -1,9 +1,9 @@
 terraform { 
   cloud { 
-    organization = "gcp-live"
-    workspaces {
-      tags = ["gcp-live", "vault"]
-    }
+    # organization = "gcp-live"
+    # workspaces {
+    #   tags = ["gcp-live", "vault"]
+    # }
   } 
 required_providers {
     vault = {

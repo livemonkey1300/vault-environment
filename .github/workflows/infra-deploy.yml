@@ -38,8 +38,12 @@ jobs:
       
       - name: Terraform Init
         run: terraform init
+        env:
+          TF_WORKSPACE: "multienv-vault"
+          TF_CLOUD_ORGANIZATION: "gcp-live"
       
       - name: Terraform Action
         run: terraform ${{ github.event.inputs.terraform_action || 'plan' }}
         env:
           TF_WORKSPACE: "multienv-vault"
+          TF_CLOUD_ORGANIZATION: "gcp-live"

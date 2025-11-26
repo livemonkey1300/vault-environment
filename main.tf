@@ -70,9 +70,38 @@ resource "vault_approle_auth_backend_role" "github_actions" {
     token_ttl      = 600
     token_max_ttl  = 1200
 }
-
 resource "vault_approle_auth_backend_role_secret_id" "github_actions" {
-  for_each  = toset(var.environment)
-  backend   = vault_auth_backend.approle.path
-  role_name = vault_approle_auth_backend_role.github_actions[each.key].role_name
+    for_each  = toset(var.environment)
+    backend   = vault_auth_backend.approle.path
+    role_name = vault_approle_auth_backend_role.github_actions[each.key].role_name
 }
+
+# Store AppRole credentials in Vault KV store
+resource "vault_generic_secret" "github_actions_credentials" {
+    for_each = toset(var.environment)
+    path     = "${vault_mount.kv[each.key].path}/github-actions"
+    
+    data_json = jsonencode({
+        role_id   = vault_approle_auth_backend_role.github_actions[each.key].role_id
+        secret_id = vault_approle_auth_backend_role_secret_id.github_actions[each.key].secret_id
+    })
+    
+    depends_on = [vault_approle_auth_backend_role_secret_id.github_actions]
+}
+
+# Output the role IDs and secret IDs for pipeline use
+output "github_actions_role_ids" {
+    value = {
+        for env in var.environment : env => vault_approle_auth_backend_role.github_actions[env].role_id
+    }
+    description = "AppRole role IDs for GitHub Actions authentication"
+}
+
+output "github_actions_secret_ids" {
+    value = {
+        for env in var.environment : env => vault_approle_auth_backend_role_secret_id.github_actions[env].secret_id
+    }
+    description = "AppRole secret IDs for GitHub Actions authentication"
+    sensitive = true
+}
+

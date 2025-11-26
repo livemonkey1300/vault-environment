@@ -39,14 +39,14 @@ jobs:
       - name: Terraform Init
         run: terraform init -input=false
         env:
-          TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
-          TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
+          TF_WORKSPACE: multienv-vault
+          TF_CLOUD_ORGANIZATION: gcp-live
 
       - name: Select or create workspace
-        run: terraform workspace select -or-create ${{ secrets.TF_WORKSPACE }}
+        run: terraform workspace select -or-create multienv-vault
       
       - name: Terraform Action
         run: terraform ${{ github.event.inputs.terraform_action || 'plan' }}
         env:
-          TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
-          TF_CLOUD_ORGANIZATION: ${{ secrets.TF_CLOUD_ORGANIZATION }}
+          TF_WORKSPACE: multienv-vault
+          TF_CLOUD_ORGANIZATION: gcp-live

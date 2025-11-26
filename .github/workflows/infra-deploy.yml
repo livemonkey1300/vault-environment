@@ -35,15 +35,17 @@ jobs:
         with:
           terraform_version: latest
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      
+
+      - name: Select or create workspace
+        run: terraform workspace select -or-create multienv-vault
+        
       - name: Terraform Init
         run: terraform init -input=false
         env:
           TF_WORKSPACE: multienv-vault
           TF_CLOUD_ORGANIZATION: gcp-live
 
-      - name: Select or create workspace
-        run: terraform workspace select -or-create multienv-vault
+
       
       - name: Terraform Action
         run: terraform ${{ github.event.inputs.terraform_action || 'plan' }}

@@ -1,9 +1,6 @@
 terraform { 
   cloud { 
     organization = "gcp-live"
-    workspaces {
-      name = var.tfc_workspace
-    }
   } 
 required_providers {
     vault = {

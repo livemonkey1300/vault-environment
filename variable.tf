@@ -4,7 +4,7 @@ variable "environment" {
   default     = ["staging" , "prod" , "dev" ]
 }
 
-variable "tfc_workspace" {
-  description = "Terraform Cloud workspace name"
-  type        = string
-}
+# variable "tfc_workspace" {
+#   description = "Terraform Cloud workspace name"
+#   type        = string
+# }

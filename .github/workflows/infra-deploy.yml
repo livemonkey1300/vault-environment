@@ -42,5 +42,4 @@ jobs:
       - name: Terraform Action
         run: terraform ${{ github.event.inputs.terraform_action || 'plan' }}
         env:
-          TF_VAR_environment: ${{ github.event.inputs.environment || 'staging' }}
-          TF_VAR_tfc_workspace: ${{ vars.TFC_WORKSPACE }}
+          TF_VAR_tfc_workspace: "multienv-vault"

@@ -6,10 +6,24 @@ required_providers {
       source = "hashicorp/vault"
       version = "5.4.0"
     }
+    digitalocean = {
+        source = "digitalocean/digitalocean"
+        version = "~> 2.0"
+    }
 }
 }
 
 provider "vault" {}
+
+data "vault_generic_secret" "digitalocean_token" {
+  path = "token/digitalocean"
+}
+
+provider "digitalocean" {
+  token = jsondecode(data.vault_generic_secret.digitalocean_token.data_json)["token"]
+}
+
+
 
 resource "vault_mount" "kv" {
     for_each = toset(var.environment)
@@ -37,6 +51,12 @@ resource "vault_generic_secret" "ssh_keypair" {
     })
 }
 
+#Create DigitalOcean SSH key using the generated public key
+resource "digitalocean_ssh_key" "vault_generated" {
+    for_each = toset(var.environment)
+    name       = "vault-generated-key-${each.value}"
+    public_key = jsondecode(vault_generic_secret.ssh_keypair[each.key].data_json)["public_key"]
+}
 
 # Create GitHub Actions service account policy
 resource "vault_policy" "github_actions_policy" {

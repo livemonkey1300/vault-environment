@@ -8,3 +8,17 @@ variable "environment" {
 #   description = "Terraform Cloud workspace name"
 #   type        = string
 # }
+
+
+variable "google_region" {
+  description = "The Google Cloud region to deploy resources in"
+  type        = string
+  default     = "northamerica-northeast1"
+}
+
+variable "google_project" {
+  description = "The Google Cloud project ID"
+  type        = string
+  default     = "dev-ops-275615"
+  
+}

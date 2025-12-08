@@ -10,6 +10,10 @@ required_providers {
         source = "digitalocean/digitalocean"
         version = "~> 2.0"
     }
+    google = {
+      source = "hashicorp/google"
+      version = "7.12.0"
+    }
 }
 }
 
@@ -23,7 +27,10 @@ provider "digitalocean" {
   token = jsondecode(data.vault_generic_secret.digitalocean_token.data_json)["token"]
 }
 
-
+provider "google" {
+  project     =  var.google_project
+  region      = var.google_region
+}
 
 resource "vault_mount" "kv" {
     for_each = toset(var.environment)
@@ -56,6 +63,15 @@ resource "digitalocean_ssh_key" "vault_generated" {
     for_each = toset(var.environment)
     name       = "vault-${each.value}"
     public_key = jsondecode(vault_generic_secret.ssh_keypair[each.key].data_json)["public_key"]
+}
+
+# Add SSH key to Google Cloud project metadata
+resource "google_compute_project_metadata" "ssh_keys" {
+  for_each = toset(var.environment)
+  
+  metadata = {
+    ssh-keys = "vault-${each.value}:${jsondecode(vault_generic_secret.ssh_keypair[each.key].data_json)["public_key"]}"
+  }
 }
 
 # Create GitHub Actions service account policy

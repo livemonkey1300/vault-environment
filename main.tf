@@ -54,7 +54,7 @@ resource "vault_generic_secret" "ssh_keypair" {
 #Create DigitalOcean SSH key using the generated public key
 resource "digitalocean_ssh_key" "vault_generated" {
     for_each = toset(var.environment)
-    name       = "vault-generated-key-${each.value}"
+    name       = "vault-${each.value}"
     public_key = jsondecode(vault_generic_secret.ssh_keypair[each.key].data_json)["public_key"]
 }
 

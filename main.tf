@@ -66,11 +66,14 @@ resource "digitalocean_ssh_key" "vault_generated" {
 }
 
 # Add SSH key to Google Cloud project metadata
+
+# Add SSH key to Google Cloud project metadata
 resource "google_compute_project_metadata" "ssh_keys" {
-  for_each = toset(var.environment)
-  
   metadata = {
-    ssh-keys = "vault-${each.value}:${jsondecode(vault_generic_secret.ssh_keypair[each.key].data_json)["public_key"]}"
+    ssh-keys = join("\n", [
+      for env in var.environment :
+      "vault-${env}:${jsondecode(vault_generic_secret.ssh_keypair[env].data_json)["public_key"]}"
+    ])
   }
 }
 
